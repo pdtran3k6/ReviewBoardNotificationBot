@@ -16,6 +16,9 @@ var connector = new builder.ChatConnector({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
+
+// var connector = new builder.ConsoleConnector().listen();
+
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 
@@ -23,13 +26,10 @@ server.use(restify.bodyParser());
 server.post('/api/notify', function (req, res, next) {
     //Process posted notification
     var address = req.body.address;
-    // console.log(address);
     var notification = req.body.notification;
 
     console.log(address);
     console.log(notification);
-
-    
 
     return next();
     // Send notification as a proactive message
@@ -44,12 +44,41 @@ server.post('/api/notify', function (req, res, next) {
     // });
 });
 
+//var myAddress;
 //=========================================================
 // Bots Dialogs
 //=========================================================
 
-bot.dialog('/', 
+// bot.dialog('/', 
+//     function (session, results) {
+//         myAddress = session.message.address;
+//         session.send(JSON.stringify(myAddress));
+//     }
+// );
+
+bot.dialog('/notify', 
     function (session, results) {
-        session.send("done");
+        session.send("hello, this is a proactive message from the bot");
     }
 );
+
+bot.beginDialog({
+    "id":"ngd0k0abg059gjil9",
+    "channelId":"emulator",
+    "user":
+    {
+        "id":"default-user",
+        "name":"User"
+    },
+    "conversation":
+    {
+        "id":"1e45gd2cej2519g7c"
+    },
+    "bot":
+    {
+        "id":"default-bot"
+    },
+    "serviceUrl":"http://localhost:9002",
+    "useAuth":false
+}, '/notify');
+

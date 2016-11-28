@@ -17,68 +17,51 @@ var connector = new builder.ChatConnector({
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
-// var connector = new builder.ConsoleConnector().listen();
-
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
-
-server.use(restify.bodyParser());
-server.post('/api/notify', function (req, res, next) {
-    //Process posted notification
-    var address = req.body.address;
-    var notification = req.body.notification;
-
-    console.log(address);
-    console.log(notification);
-
-    return next();
-    // Send notification as a proactive message
-    // var msg = new builder.Message()
-    //     .address(address)
-    //     .text(notification);
-
-    // bot.send(msg, function (err) {
-    //     // Return success/failure
-    //     res.status(err ? 500 : 200);
-    //     res.end();
-    // });
+bot.dialog("/", function(session, result) {
+    session.send("I'm in the zone");
+    session.replaceDialog("/createSubscription");
+});
+bot.dialog('/createSubscription', function (session) {
+    // Serialize users address to a string.
+    var address = JSON.stringify(session.message.address);
+    session.send(address);
 });
 
-//var myAddress;
-//=========================================================
-// Bots Dialogs
-//=========================================================
+//server.use(restify.bodyParser());
+// server.post('/api/notify', function (req, res) {
+//     //Process posted notification
+//     var address = {
+//     "id":"dfefwc",
+//     "channelId":"emulator",
+//     "user":
+//     {
+//         "id":"default-user",
+//         "name":"User"
+//     },
+//     "conversation": {
+//         "id": "lhmga4i8dl5f9ci6i"
+//     },
+//     "bot":
+//     {
+//         "id":"default-bot",
+//         "name":"Bot1"
+//     },
+//     "serviceUrl":"http://localhost:9002",
+//     "useAuth":false
+//     };
+//     var notification = req.body.notification;
 
-// bot.dialog('/', 
-//     function (session, results) {
-//         myAddress = session.message.address;
-//         session.send(JSON.stringify(myAddress));
-//     }
-// );
+//     // Send notification as a proactive message
+//     var msg = new builder.Message()
+//         .address(address)
+//         .text(notification);
 
-bot.dialog('/notify', 
-    function (session, results) {
-        session.send("hello, this is a proactive message from the bot");
-    }
-);
-
-bot.beginDialog({
-    "id":"ngd0k0abg059gjil9",
-    "channelId":"emulator",
-    "user":
-    {
-        "id":"default-user",
-        "name":"User"
-    },
-    "conversation":
-    {
-        "id":"1e45gd2cej2519g7c"
-    },
-    "bot":
-    {
-        "id":"default-bot"
-    },
-    "serviceUrl":"http://localhost:9002",
-    "useAuth":false
-}, '/notify');
+//     bot.send(msg, function (err) {
+//         // Return success/failure
+//         res.status(err ? 699 : 200);
+//         res.end();
+//     });
+// });
 

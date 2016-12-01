@@ -36,12 +36,18 @@ server.post('/api/notify', function (req, res) {
     {},
     "serviceUrl":"http://192.168.0.18:9002", // this won't be needed once we transition to Skype
     };
-    var notification = JSON.stringify(req.body);
+    var request = JSON.parse(req.body);
+    var username = request.username; 
+    var title = request.attachments[0].title;
+    var title_link = request.attachments[0].title_link;
+    var pre_text = request.attachments[0].pretext;
 
-    // Send notification as a proactive message
     var msg = new builder.Message()
         .address(address)
-        .text(notification);
+        .text("**" + username + "**" + "\n\n" 
+        + pre_text + "\n\n" 
+        + "[" + title + "]" + "(" + title_link + ")" + "\n\n"
+        )
 
     bot.send(msg, function (err) {
         // Return success/failure
@@ -49,4 +55,3 @@ server.post('/api/notify', function (req, res) {
         res.end();
     });
 });
-

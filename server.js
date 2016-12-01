@@ -18,19 +18,6 @@ var connector = new builder.ChatConnector({
 });
 
 var bot = new builder.UniversalBot(connector);
-// server.post('/api/generateNecessaryIds', connector.listen());
-// bot.dialog('/', function (session, results) {
-//     // Serialize users address to a string.
-//     var conversation_id = JSON.stringify(session.message.address.conversation.id);
-//     var user_id = JSON.stringify(session.message.address.user.id);
-//     var bot_id = JSON.stringify(session.message.address.bot.id);
-//     var channel_id = session.message.address.channelId;
-//     session.sendTyping();
-//     session.send("Conversation id is %s", conversation_id);
-//     session.send("User id is %s", user_id);
-//     session.send("Bot id is %s", bot_id);
-//     sessions.send(channel_id);
-// });
 
 server.use(restify.bodyParser());
 server.post('/api/notify', function (req, res) {

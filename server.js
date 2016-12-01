@@ -19,6 +19,12 @@ var connector = new builder.ChatConnector({
 
 var bot = new builder.UniversalBot(connector);
 
+// Serve a static web page
+server.get(/.*/, restify.serveStatic({
+	'directory': '.',
+	'default': 'index.html'
+}));
+
 server.use(restify.bodyParser());
 server.post('/api/notify', function (req, res) {
     //Process posted notification

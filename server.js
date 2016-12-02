@@ -32,11 +32,11 @@ server.post('/api/notify/:channel/:conversation_id', function (req, res) {
     // random string, doesn't really matter, but it has to be there 
     // in order for it to work
     "id": Math.random().toString(36).substr(3, 8),
-    "channelId": req.params.channel,
+    "channelId": JSON.stringify(req.params.channel),
     "user":
     {},
     "conversation": {
-        "id": req.params.conversation_id // hardcoded for testing purpose
+        "id": JSON.stringify(req.params.conversation_id) // hardcoded for testing purpose
     },
     "bot":
     {},

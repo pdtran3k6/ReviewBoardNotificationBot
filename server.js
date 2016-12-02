@@ -34,7 +34,6 @@ server.post('/api/notify/:channel/:conversation_id', function (req, res) {
     },
     "bot":
     {},
-    "serviceUrl":"http://192.168.0.18:9002", // this won't be needed once we transition to Skype
     };
     
     var request = JSON.parse(req.body);

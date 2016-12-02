@@ -57,7 +57,7 @@ server.post('/api/notify/:channel/:conversation_id', function (req, res) {
 
     bot.send(msg, function (err) {
         // Return success/failure
-        res.status(err ? 500 : 200);
+        res.status(err ? 699 : 200);
         res.end();
     });
 });

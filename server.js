@@ -61,3 +61,13 @@ server.post('/api/notify', function (req, res) {
         res.end();
     });
 });
+
+server.post('/api/messages', connector.listen());
+bot.dialog('/', function (session, results) {
+     // Serialize users address to a string.
+     var conversation_id = session.message.address.conversation.id;
+     var channel_id = session.message.address.channelId;
+     var webhook_url = "http://reviewboardbot.azurewebsites.net/api/notify/" + channel_id + "/" + conversation_id 
+     session.sendTyping();
+     session.send("Your bot webhook URL is: " + webhook_url);
+ });

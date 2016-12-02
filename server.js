@@ -26,22 +26,23 @@ server.get(/.*/, restify.serveStatic({
 }));
 
 server.use(restify.bodyParser());
-server.post('/api/notify', function (req, res) {
+server.post('/api/notify/:channel/:conversation_id', function (req, res) {
     //Process posted notification
     var address = {
     // random string, doesn't really matter, but it has to be there 
     // in order for it to work
-    "id":"dfefwc",
-    "channelId":"emulator",
+    "id": Math.random().toString(36).substr(3, 8),
+    "channelId": req.params.channel,
     "user":
     {},
     "conversation": {
-        "id":"gg6b0clc812cj0k2f" // hardcoded for testing purpose
+        "id": req.params.conversation_id // hardcoded for testing purpose
     },
     "bot":
     {},
     "serviceUrl":"http://192.168.0.18:9002", // this won't be needed once we transition to Skype
     };
+    
     var request = JSON.parse(req.body);
     var username = request.username; 
     var title = request.attachments[0].title;

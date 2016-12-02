@@ -40,6 +40,7 @@ server.post('/api/notify/:channel/:conversation_id', function (req, res) {
     },
     "bot":
     {},
+    "serviceUrl": "https://apis.skype.com",
     };
     
     var request = JSON.parse(req.body);
@@ -54,6 +55,7 @@ server.post('/api/notify/:channel/:conversation_id', function (req, res) {
         + pre_text + "\n\n" 
         + "[" + title + "]" + "(" + title_link + ")" + "\n\n"
         )
+    
 
     bot.send(msg, function (err) {
         // Return success/failure

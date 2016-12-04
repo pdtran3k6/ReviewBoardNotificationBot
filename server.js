@@ -13,53 +13,39 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 
 // Create chat bot
 var connector = new builder.ChatConnector({
-    appId: process.env.MICROSOFT_APP_ID,
-    appPassword: process.env.MICROSOFT_APP_PASSWORD
+    //appId: process.env.MICROSOFT_APP_ID,
+    appId: "804149ac-9bec-4d4e-a296-bb7ce07c24e6",
+    appPassword: "spCVgoTVuRxkipd3rZMeMoT"
+    //appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
 var bot = new builder.UniversalBot(connector);
 
 // Serve a static web page
 server.get(/.*/, restify.serveStatic({
-	'directory': '.',
-	'default': 'index.html'
+    'directory': '.',
+    'default': 'index.html'
 }));
 
 server.use(restify.bodyParser());
-server.post('/api/notify/:channel/:conversation_id', function (req, res) {
-    //Process posted notification
-    var address = {
-    // random string, doesn't really matter, but it has to be there 
-    // in order for it to work
-    "id": Math.random().toString(36).substr(3, 8),
-    "channelId": JSON.stringify(req.params.channel),
-    "user":
-    {},
-    "conversation": {
-        "id": JSON.stringify(req.params.conversation_id) // hardcoded for testing purpose
-    },
-    "bot":
-    {},
-    
-    };
-    
+server.post('/api/notify/:address', function (req, res) {
+    var address = JSON.parse(new Buffer(req.params.address, 'base64').toString('ascii'));
     var request = JSON.parse(req.body);
-    var username = request.username; 
+    var username = request.username;
     var title = request.attachments[0].title;
     var title_link = request.attachments[0].title_link;
     var pre_text = request.attachments[0].pretext;
 
     var msg = new builder.Message()
         .address(address)
-        .text("**" + username + "**" + "\n\n" 
-        + pre_text + "\n\n" 
+        .text("**" + username + "**" + "\n\n"
+        + pre_text + "\n\n"
         + "[" + title + "]" + "(" + title_link + ")" + "\n\n"
-        )
-    
+        );
 
     bot.send(msg, function (err) {
         // Return success/failure
-        res.status(err ? 699 : 200);
+        res.status(err ? 500 : 200);
         console.log(err);
         res.end();
     });
@@ -67,10 +53,12 @@ server.post('/api/notify/:channel/:conversation_id', function (req, res) {
 
 server.post('/api/messages', connector.listen());
 bot.dialog('/', function (session, results) {
-     // Serialize users address to a string.
-     var conversation_id = session.message.address.conversation.id;
-     var channel_id = session.message.address.channelId;
-     var webhook_url = "http://reviewboardbot.azurewebsites.net/api/notify/" + channel_id + "/" + conversation_id 
-     session.sendTyping();
-     session.send("Your bot webhook URL is: " + webhook_url);
- });
+    // Serialize users address to a string.
+    var conversation_id = session.message.address.conversation.id;
+    var channel_id = session.message.address.channelId;
+    var address = JSON.stringify(session.message.address);
+    var encodedAddress = new Buffer(address).toString('base64');
+    var webhook_url = "http://reviewboardbot.azurewebsites.net/api/notify/" + encodedAddress;
+    session.sendTyping();
+    session.send("Your bot webhook URL is: " + webhook_url);
+});

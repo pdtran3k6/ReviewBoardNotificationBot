@@ -26,37 +26,41 @@ server.get(/.*/, restify.serveStatic({
 }));
 
 server.use(restify.bodyParser());
-server.post('/api/notify/:address', function (req, res) {
-    var address = JSON.parse(new Buffer(req.params.address, 'base64').toString('ascii'));
+server.post('/api/notify/:encoded_address', function (req, res) {
+    // Convert the address in the webhook's URL into JSON 
+    var decoded_address = 
+    new Buffer(req.params.encoded_address, 'base64').toString('ascii');
+    var address = JSON.parse(decoded_address);
+
+    // Body of notification
     var request = JSON.parse(req.body);
     var username = request.username;
     var title = request.attachments[0].title;
     var title_link = request.attachments[0].title_link;
     var pre_text = request.attachments[0].pretext;
 
+    // Construct the message with address and text for the bot
     var msg = new builder.Message()
         .address(address)
-        .text("**" + username + "**" + "\n\n"
-        + pre_text + "\n\n"
-        + "[" + title + "]" + "(" + title_link + ")" + "\n\n"
-        );
+        .text(`**${username}**\n\n${pre_text}\n\n[${title}](${title_link})`);
 
     bot.send(msg, function (err) {
-        // Return success/failure
+        // Return success/failure status code
         res.status(err ? 500 : 200);
-        console.log(err);
+        if (err) {
+            console.log(JSON.stringify(err));
+        }
         res.end();
     });
 });
 
 server.post('/api/messages', connector.listen());
 bot.dialog('/', function (session, results) {
-    // Serialize users address to a string.
-    var conversation_id = session.message.address.conversation.id;
-    var channel_id = session.message.address.channelId;
+    // Serialize user's address JSON object into a base64 string.
     var address = JSON.stringify(session.message.address);
-    var encodedAddress = new Buffer(address).toString('base64');
-    var webhook_url = "http://reviewboardbot.azurewebsites.net/api/notify/" + encodedAddress;
+    var encoded_address = new Buffer(address).toString('base64');
+    var webhook_url = 
+    `http://reviewboardbot.azurewebsites.net/api/notify/${encoded_address}`;
     session.sendTyping();
-    session.send("Your bot webhook URL is: " + webhook_url);
+    session.send(`Your bot webhook URL is: ${webhook_url}`);
 });

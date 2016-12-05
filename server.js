@@ -26,23 +26,23 @@ server.get(/.*/, restify.serveStatic({
 }));
 
 server.use(restify.bodyParser());
-server.post('/api/notify/:encoded_address', function (req, res) {
+server.post('/api/notify/:encodedAddress', function (req, res) {
     // Convert the address in the webhook's URL into JSON 
-    var decoded_address = 
-    new Buffer(req.params.encoded_address, 'base64').toString('ascii');
-    var address = JSON.parse(decoded_address);
+    var decodedAddress = 
+        new Buffer(req.params.encodedAddress, 'base64').toString('ascii');
+    var address = JSON.parse(decodedAddress);
 
     // Body of notification
     var request = JSON.parse(req.body);
     var username = request.username;
     var title = request.attachments[0].title;
-    var title_link = request.attachments[0].title_link;
-    var pre_text = request.attachments[0].pretext;
+    var titleLink = request.attachments[0].title_link;
+    var preText = request.attachments[0].pretext;
 
     // Construct the message with address and text for the bot
     var msg = new builder.Message()
         .address(address)
-        .text(`**${username}**\n\n${pre_text}\n\n[${title}](${title_link})`);
+        .text(`**${username}**\n\n${preText}\n\n[${title}](${titleLink})`);
 
     bot.send(msg, function (err) {
         // Return success/failure status code
@@ -58,9 +58,10 @@ server.post('/api/messages', connector.listen());
 bot.dialog('/', function (session, results) {
     // Serialize user's address JSON object into a base64 string.
     var address = JSON.stringify(session.message.address);
-    var encoded_address = new Buffer(address).toString('base64');
+    var encodedAddress = new Buffer(address).toString('base64');
+    var domainName = server.url;
     var webhook_url = 
-    `http://reviewboardbot.azurewebsites.net/api/notify/${encoded_address}`;
+        `${domainName}/api/notify/${encodedAddress}`;
     session.sendTyping();
     session.send(`Your bot webhook URL is: ${webhook_url}`);
 });

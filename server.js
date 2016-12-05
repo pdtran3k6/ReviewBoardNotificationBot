@@ -59,9 +59,9 @@ bot.dialog('/', function (session, results) {
     // Serialize user's address JSON object into a base64 string.
     var address = JSON.stringify(session.message.address);
     var encodedAddress = new Buffer(address).toString('base64');
-    var domainName = server.url;
+    var botURL = "http://reviewboardbot.azurewebsites.net";
     var webhook_url = 
-        `${domainName}/api/notify/${encodedAddress}`;
+        `${botURL}/api/notify/${encodedAddress}`;
     session.sendTyping();
     session.send(`Your bot webhook URL is: ${webhook_url}`);
 });

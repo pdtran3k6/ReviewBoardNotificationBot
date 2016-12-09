@@ -1,30 +1,28 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 
-//=========================================================
-// Bot Setup
-//=========================================================
-
-// Setup Restify Server
+// Set up Restify Server
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 
-// Create chat bot
+// Set up connector
 var connector = new builder.ChatConnector({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
+// Create the bot
 var bot = new builder.UniversalBot(connector);
 
-// Serve a static web page
+// Serve a static web page for the bot
 server.get(/.*/, restify.serveStatic({
     'directory': '.',
     'default': 'index.html'
 }));
 
+// Use restify.bodyParser() to access body attribute of request
 server.use(restify.bodyParser());
 server.post('/api/notify/:encodedAddress', function (req, res) {
     // Convert the address in the webhook's URL into JSON 
